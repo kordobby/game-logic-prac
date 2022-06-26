@@ -1,30 +1,23 @@
-import { useEffect } from "react";
 import { useState } from "react";
-import { clearInterval } from "timers";
+import { useEffect } from "react";
 export const Timer = () => {
-  const [min, setMin] = useState(3);
-  const [sec, setSec] = useState(0);
-  const time = useRef(180);
-  const timerId = useRef(null);
+  const [seconds, setSeconds] = useState(30);
 
   useEffect(() => {
-    timerId.current = setInterval(() => {
-      setMin(parseInt(time.current / 60));
-      setSec(time.current % 60);
-      time.current -= 1;
+    const countdown = setInterval(() => {
+      if (seconds > 0) {
+        setSeconds(seconds - 1);
+      }
     }, 1000);
-    return () => clearInterval(timerId.current);
-  }, []);
+    return () => clearInterval(countdown);
+  }, [seconds]);
 
-  useEffect(() => {
-    if (time.current <= 0) {
-      console.log("time out");
-      clearInterval(timerId.current);
-    }
-  }, [sec]);
   return (
-    <div className="timer">
-      {min}분 {sec}초
+    <div>
+      <h1>CountDown!</h1>
+      <div>
+        <h2>00:{seconds < 10 ? `0${seconds}` : seconds}</h2>
+      </div>
     </div>
   );
 };

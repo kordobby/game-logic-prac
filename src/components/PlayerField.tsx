@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { Cards } from "../elem/Cards";
 import { PlayerProfile } from "../elem/PlayerProfile";
+import { Timer } from "./Timer";
 
 export const PlayerFieldWrap = styled.div`
   width: 100%;
@@ -19,16 +20,14 @@ export const CardZone = styled.div`
   align-items: center;
   justify-content: center;
 `;
-export const PlayerField = ({ selectCardHanlder, cardIdRef }) => {
+export const PlayerField = ({ selectCardHanlder }) => {
   return (
     <PlayerFieldWrap>
       <PlayerProfile></PlayerProfile>
       <CardZone>
-        <Cards
-          selectCardHanlder={selectCardHanlder}
-          cardIdRef={cardIdRef}
-        ></Cards>
+        <Cards selectCardHanlder={selectCardHanlder}></Cards>
       </CardZone>
+      <Timer></Timer>
     </PlayerFieldWrap>
   );
 };

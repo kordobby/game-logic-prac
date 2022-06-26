@@ -11,7 +11,7 @@ const CardBox = styled.div`
   }
 `;
 
-export const Cards = ({ selectCardHanlder, cardIdRef }) => {
+export const Cards = ({ selectCardHanlder }) => {
   const [cardActive, setCardActive] = useState(false);
   const onMouseOver = () => {
     setCardActive(true);
@@ -23,7 +23,7 @@ export const Cards = ({ selectCardHanlder, cardIdRef }) => {
   return (
     <CardBox onMouseOver={onMouseOver} onMouseOut={onMouseOut}>
       {cardActive ? (
-        <div id="hello" cardIdRef>
+        <div id="hello">
           <span>cardname</span>
           <button onClick={selectCardHanlder}>select</button>
         </div>
