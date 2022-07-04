@@ -19,6 +19,7 @@
     "stompjs": "^2.3.3",
     "styled-components": "^5.3.5",
     "thunk": "^0.0.1",
+    "universal-cookie": "^4.0.4",
     "web-vitals": "^2.1.0"
   },
   "scripts": {
