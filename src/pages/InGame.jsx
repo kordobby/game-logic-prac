@@ -25,6 +25,10 @@ const InGame = () => {
   const [nowPlayer, setNowPlayer] = useState("");
   // 이번에 사용한 카드
   const [usedCard, setUsedCard] = useState("");
+  const [selectableCard, setSelectableCard] = useState([]);
+
+  // select Modal
+  const [cardDrawModal, setCardDrawModal] = useState(false);
 
   // 해당페이지 왔을 때, 소켓 연결
   useEffect = () => {
@@ -35,20 +39,37 @@ const InGame = () => {
         console.log(response);
         if (response?.type === "START") {
           // 접속 플레이어의 정보 저장
-          setMyState(response?.players.filter( playerId === thisPlayer));
+          setMyState(response?.players.filter(playerId === thisPlayer));
           // 다른 플레이어들의 정보 저장
-          const otherPlayers = response?.players.filter( playerId !== thisPlayer);
+          const otherPlayers = response?.players.filter(
+            playerId !== thisPlayer
+          );
           setPlayerA(otherPlayers[0]);
           setPlayerB(otherPlayers[1]);
           setPlayerC(otherPlayers[2]);
           // 이번 턴 진행하는 플레이어 정보 확인
-          const findNowPlayer = response?.players.filter( turn === true);
+          const findNowPlayer = response?.players.filter(turn === true);
           setNowPlayer(findNowPlayer.playerId);
           // 턴을 여기서 넘겨야하나? 고민중 ( setTimeout 으로 시간을 좀 줘도 될듯)
-          setStatus("draw")
+          setStatus("draw");
         } else if (response?.type === "PRECHECK") {
-          setMyCard(response?.message);
-        } // 이런식으로 데이터 관리할 것이고, store 사용여부는 고민중
+          if (response?.message.gameOver === true) {
+            setStatus("endGame");
+          } else {
+            setMyState(response?.message); // 내 턴 스테이터스 확인
+            setStatus("draw");
+          }
+        } else if (response?.type === "DRAW") {
+          if (response?.message.cardDrawed) {
+            setSelectableCard(response?.message.cardDrawed);
+            selectCardTurn();
+            // setTimeout for 10 sec
+            // openModal for SelectCard
+          } else {
+            // go to EndDraw
+            setStatus("endDraw");
+          }
+        }
       });
     });
     return console.log("socketUnsubscribe"); // 나갈때 구독 끊기
@@ -57,7 +78,7 @@ const InGame = () => {
   // #1. 게임 시작
   const readyGameHandler = () => {
     setStatus("isStart");
-  }
+  };
 
   // #2. 인게임 내부 게임 시작 버튼, 게임 모든 데이터 수령
   const readyForGame = () => {
@@ -72,34 +93,50 @@ const InGame = () => {
       JSON.stringify(data)
     );
 
-    if(data) {
+    if (data) {
       setStatus("preCheck");
     }
   };
 
-  // #3. 
+  // #3.
   const preCheck = () => {
     const data = {
       type: "PRECHECK",
       sender: thisPlayer,
-      message: {playerId: thisPlayer} // 서버에서 id 내려주면 그걸로 바꾸기
+      message: { playerId: thisPlayer }, // 서버에서 id 내려주면 그걸로 바꾸기
     };
-    stompClient.send(
-      "endPoint",
-      { token: accessToken },
-      JSON.stringify(data)
-    );
-  }
+    stompClient.send("endPoint", { token: accessToken }, JSON.stringify(data));
+  };
+
+  const draw = () => {
+    const data = {
+      type: "DRAW",
+      sender: thisPlayer,
+      message: { playerId: thisPlayer }, // 서버에서 id 내려주면 그걸로 바꾸기
+    };
+    stompClient.send("endPoint", { token: accessToken }, JSON.stringify(data));
+  };
+
+  const selectCardTurn = () => {
+    setCardDrawModal(true);
+  };
+
   // ##### GAME LOGIC
   useEffect(() => {
-    swtich (status) {
-      case "isStart" :
+    switch (status) {
+      case "isStart":
         readyForGame();
         break;
-      case "preCheck" :
+      case "preCheck":
         preCheck();
         break;
+      case "draw":
+        draw();
+        break;
+      default:
+        console.log("끝");
     }
-  })
+  }, [status]);
+
   return <></>;
 };
